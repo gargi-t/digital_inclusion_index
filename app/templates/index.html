@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Digital Inclusion Index</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .map-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .city-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .cluster-advanced {
+            background-color: #d4edda !important;
+        }
+        .cluster-emerging {
+            background-color: #fff3cd !important;
+        }
+        .cluster-lagging {
+            background-color: #f8d7da !important;
+        }
+    </style>
+</head>
+<body>
+    <h1>India's Digital Inclusion Index</h1>
+    
+    <div class="dashboard">
+        <div class="map-container">
+            <iframe 
+                width="100%" 
+                height="500" 
+                frameborder="0" 
+                scrolling="no" 
+                marginheight="0" 
+                marginwidth="0" 
+                src="https://maps.google.com/maps?q={{ cities[0]['City Name'] }}+India&hl=en&z=6&output=embed">
+            </iframe>
+            <div class="map-legend">
+                <h3>Cluster Legend</h3>
+                <ul>
+                    <li><span class="legend-color advanced"></span> Digitally Advanced</li>
+                    <li><span class="legend-color emerging"></span> Emerging</li>
+                    <li><span class="legend-color lagging"></span> Digitally Lagging</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="city-list">
+            <h2>Cities</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>City</th>
+                        <th>Zone</th>
+                        <th>Score</th>
+                        <th>Cluster</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for city in cities %}
+                    <tr class="cluster-{{ city['Cluster_Label'].lower().split(' ')[-1] }}">
+                        <td>{{ city['City Name'] }}</td>
+                        <td>{{ city['Zone Name'] }}</td>
+                        <td>{{ city['Digital_Inclusion_Score'] }}/8</td>
+                        <td>{{ city.get('Cluster_Label', 'N/A') }}</td>
+                        <td><a href="/policy_brief/{{ city['City Name'] }}">View Policy Brief</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Simple interactive map marker functionality
+        document.querySelectorAll('table tr').forEach(row => {
+            row.addEventListener('click', function() {
+                const cityName = this.cells[0].textContent;
+                const iframe = document.querySelector('iframe');
+                iframe.src = `https://maps.google.com/maps?q=${cityName}+India&hl=en&z=12&output=embed`;
+            });
+        });
+    </script>
+</body>
+</html>
